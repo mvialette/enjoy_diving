@@ -1,2 +1,2 @@
-# enjoy_diving
+# Enjoy Diving
 A flutter application about diving spots informations (location, description, ...)
