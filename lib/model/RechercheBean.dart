@@ -11,8 +11,8 @@ class RechercheBean {
   Set<String> places = new Set();
   Set<String> kinds = new Set();
 
-  double distanceValue = 100.0;
-  double maximumDistanceValue = 100.0;
+  double distanceValue = 30.0;
+  double maximumDistanceValue = 30.0;
   String distanceType = 'Kilometers';
 
   RechercheBean(){

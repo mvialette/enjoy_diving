@@ -1,12 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enjoy_diving/incubator6/settings.dart';
+import 'package:enjoy_diving/service/LocationController.dart';
 import 'package:enjoy_diving/view/component/CustomSpotCard.dart';
 import 'package:flutter/material.dart';
 import 'package:enjoy_diving/incubator6/ApplicationModel.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
+import 'package:queries/collections.dart';
 
 class SpotListPage  extends StatefulWidget {
 
@@ -26,9 +29,7 @@ class SpotListState extends State<SpotListPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      /*
-      drawer: Drawer5(),
-      */
+
       drawer: new Drawer(
         child: new FutureBuilder<List<List<String>>>(
           future: widget.spotService.getSpotsDistinctedValuesFromJson(),
@@ -66,6 +67,7 @@ class SpotListState extends State<SpotListPage> {
           },
         ),
       ),
+
       appBar: AppBar(
         title: Text('Enjoy Diving'),
         actions: <Widget>[
@@ -89,23 +91,27 @@ class SpotListState extends State<SpotListPage> {
         future: widget.spotService.getSpotsByRechercheBean(context),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
-              // Display a circular progress indicator when no datas ar available
-              //child: CircularProgressIndicator(),
-              child: CustomSpotCard(
-                  'Bienvenue dans l\'application "Dive Insights", pour découvrir les spots de plongées référencé, veuillez au-préalable vous rendre dans la page des paramètres de l\'application afin de la configurer. Bonne exploration.',
-                  Colors.blue),
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  CustomSpotCard(
+                      'Bienvenue dans l\'application Enjoy Diving, pour découvrir les spots de plongées référencé, veuillez au-préalable vous rendre dans la page des paramètres de l\'application afin de la configurer. Bonne exploration.',
+                      Colors.blue),
+                  Image.asset('assets/tampon_48x18.png'),
+                  CustomSpotCard(
+                      'Comment profiter au mieux de vos plongées ?',
+                      Colors.blue),
+                ],
             );
           } else if (snapshot.hasError) {
             return Center(
               child: Text('An error occurred'),
             );
           } else {
-            String texte = '';
             if (ApplicationModel
                 .of(context)
                 .fromSpot != null) {
-              texte = ApplicationModel
+              ApplicationModel
                   .of(context)
                   .fromSpot
                   .title;
@@ -127,6 +133,7 @@ class SpotListState extends State<SpotListPage> {
         },
       ),
       */
+
     );
   }
 
@@ -428,39 +435,15 @@ class _SpotList extends StatelessWidget {
           ),
       )).toList();
 
-      double northMin = spots[0].latitude;
-      double southMin = spots[0].latitude;
-
-      double eastMin = spots[0].longitude;
-      double westMin = spots[0].longitude;
-
-      spots.forEach((spot){
-        if(northMin < spot.latitude){
-          northMin = spot.latitude;
-        }
-
-        if(southMin > spot.latitude){
-          southMin = spot.latitude;
-        }
-
-        if(eastMin < spot.longitude){
-          eastMin = spot.longitude;
-        }
-
-        if(westMin > spot.longitude){
-          westMin = spot.longitude;
-        }
-      });
-
-      print('Map Bounds, northMin=${northMin}, eastMin=${eastMin}, southMin=${southMin}, westMin=${westMin}');
+      LatLngBounds mapBoundary = extractBounds(context);
 
       return new FlutterMap(
           options: new MapOptions(
             center: new LatLng(ApplicationModel.of(context).fromLocation['latitude'], ApplicationModel.of(context).fromLocation['longitude']),
             // define bound for South West
-            swPanBoundary: LatLng(southMin, westMin),
-            // define bound for North Eeat
-            nePanBoundary: LatLng(northMin, eastMin),
+            swPanBoundary: mapBoundary.southWest,
+            // define bound for North Eeast
+            nePanBoundary: mapBoundary.northEast,
             //map
             zoom: 11.0,
             minZoom: 6,
@@ -503,6 +486,58 @@ class _SpotList extends StatelessWidget {
       );
       */
       //return ;
+  }
+
+  LatLngBounds extractBounds(BuildContext context){
+    double northMin = spots[0].latitude;
+    double southMin = spots[0].latitude;
+
+    double eastMin = spots[0].longitude;
+    double westMin = spots[0].longitude;
+
+    spots.forEach((spot){
+      if(northMin < spot.latitude){
+        northMin = spot.latitude;
+      }
+
+      if(southMin > spot.latitude){
+        southMin = spot.latitude;
+      }
+
+      if(eastMin < spot.longitude){
+        eastMin = spot.longitude;
+      }
+
+      if(westMin > spot.longitude){
+        westMin = spot.longitude;
+      }
+    });
+
+    // Is the from location inside boundary ?
+    if(northMin < ApplicationModel.of(context).fromLocation['latitude']){
+      northMin = ApplicationModel.of(context).fromLocation['latitude'];
+    }
+
+    if(southMin > ApplicationModel.of(context).fromLocation['latitude']){
+      southMin = ApplicationModel.of(context).fromLocation['latitude'];
+    }
+
+    if(eastMin < ApplicationModel.of(context).fromLocation['longitude']){
+      eastMin = ApplicationModel.of(context).fromLocation['longitude'];
+    }
+
+    if(westMin > ApplicationModel.of(context).fromLocation['longitude']){
+      westMin = ApplicationModel.of(context).fromLocation['longitude'];
+    }
+
+    print('Map Bounds, northMin=${northMin}, eastMin=${eastMin}, southMin=${southMin}, westMin=${westMin}');
+
+    LatLng northEast = new LatLng(northMin, eastMin);
+    LatLng southWest = new LatLng(southMin, westMin);
+
+    LatLngBounds bounds = new LatLngBounds(northEast, southWest);
+
+    return bounds;
   }
 }
 
