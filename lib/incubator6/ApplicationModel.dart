@@ -6,6 +6,8 @@ class ApplicationModel extends InheritedModel<Map<String, double>> {
 
   final Map<String, double> fromLocation = new Map();
 
+  double boatSpeed = 14;
+
   Spot fromSpot;
 
   final RechercheBean rechercheBean = new RechercheBean();

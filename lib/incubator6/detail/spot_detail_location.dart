@@ -17,6 +17,8 @@ class SpotDetailLocation extends StatelessWidget {
     final Spot spot = ApplicationModel.of(context).toSpot;
     final Map<String, double> fromLocation = ApplicationModel.of(context).fromLocation;
 
+    final double boatSpeed = ApplicationModel.of(context).boatSpeed;
+
     return ListView(
       children: <Widget>[
         Card(
@@ -95,7 +97,7 @@ class SpotDetailLocation extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Icon(Icons.timer),
-                    CustomText('Distance (temps) depuis où l''on est : ${spot.getTimeToGo(fromLocation)}', style: textTheme.body1,)
+                    CustomText('Distance (temps) depuis où l''on est : ${spot.getTimeToGo(fromLocation, boatSpeed)}', style: textTheme.body1,)
                   ],
                 ),
               ],

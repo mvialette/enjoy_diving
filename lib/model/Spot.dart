@@ -149,8 +149,8 @@ class Spot {
     return distanceEnKmArrondis;
   }
 
-  String getTimeToGo(Map<String, double> currentLocation) {
-    double timeToGoInMinute = getDistanceFromHereInKm(currentLocation) / 14 * 60;
+  String getTimeToGo(Map<String, double> currentLocation, double boatSpeed) {
+    double timeToGoInMinute = getDistanceFromHereInKm(currentLocation) / boatSpeed * 60;
     int numberOfHour = 0;
     while (timeToGoInMinute > 60) {
       numberOfHour++;

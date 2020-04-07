@@ -22,10 +22,27 @@ class SettingsState extends State<SettingsPage> {
 
   final _formKey = GlobalKey<SettingsState>();
 
+  // of the TextField.
+  final myController = TextEditingController();
+
   bool deviceLocationEnable = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    myController.text = ApplicationModel.of(context).boatSpeed.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -163,6 +180,29 @@ class SettingsState extends State<SettingsPage> {
                       ],
                     ),
                   ),
+                  SliverGroupHeader(header: 'Navigation'),
+                  SliverBoxContent(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        new Text(
+                          "Quelle est la vitesse de votre navire ? (default 14 km/h)",
+                        ),
+                        TextField(
+                          controller: myController,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Vitesse ( km/h )',
+                            prefixIcon: Icon(Icons.timer),
+                          ),
+                          keyboardType: TextInputType.number,
+                          onSubmitted: (text) {
+                            ApplicationModel.of(context).boatSpeed = double.parse(text);
+                          },
+                        )
+                      ],
+                    ),
+                  ),
                   SliverGroupHeader(header: 'A propos'),
                   SliverBoxContent(
                     child: Column(
@@ -183,11 +223,6 @@ class SettingsState extends State<SettingsPage> {
   }
 
   bool isLocationDefined(BuildContext context) => ApplicationModel.of(context).fromLocation == null || ApplicationModel.of(context).fromLocation.length == 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 }
 
 
