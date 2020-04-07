@@ -5,6 +5,7 @@ import 'package:enjoy_diving/service/LocationController.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
 import 'package:enjoy_diving/view/component/SliverBoxContent.dart';
 import 'package:enjoy_diving/view/component/SliverGroupHeader.dart';
+import 'package:package_info/package_info.dart';
 
 class SettingsPage extends StatefulWidget {
 
@@ -27,9 +28,17 @@ class SettingsState extends State<SettingsPage> {
 
   bool deviceLocationEnable = false;
 
+  PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+  );
+
   @override
   void initState() {
     super.initState();
+    _initPackageInfo();
   }
 
   @override
@@ -37,6 +46,13 @@ class SettingsState extends State<SettingsPage> {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initPackageInfo() async {
+    final PackageInfo info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfo = info;
+    });
   }
 
   @override
@@ -204,12 +220,25 @@ class SettingsState extends State<SettingsPage> {
                     ),
                   ),
                   SliverGroupHeader(header: 'A propos'),
+
                   SliverBoxContent(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
                           "Cette application est développée par Maxime VIALETTE.",
+                        ),
+                        Text(
+                          "App name : ${_packageInfo.appName}",
+                        ),
+                        Text(
+                          "Package name : ${_packageInfo.packageName}",
+                        ),
+                        Text(
+                          "App version : ${_packageInfo.version}",
+                        ),
+                        Text(
+                          "Build number : ${_packageInfo.buildNumber}",
                         ),
                       ],
                     ),
