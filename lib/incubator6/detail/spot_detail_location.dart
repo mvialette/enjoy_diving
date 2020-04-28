@@ -4,7 +4,7 @@ import 'package:enjoy_diving/view/component/CustomText.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../ApplicationModel.dart';
+import '../../model/ApplicationModel.dart';
 
 class SpotDetailLocation extends StatelessWidget {
 

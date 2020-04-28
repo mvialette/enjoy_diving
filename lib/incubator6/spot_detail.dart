@@ -4,7 +4,7 @@ import 'package:enjoy_diving/incubator6/detail/spot_detail_informations.dart';
 import 'package:enjoy_diving/incubator6/detail/spot_detail_location.dart';
 import 'package:enjoy_diving/incubator6/detail/spot_detail_pictures.dart';
 import 'package:flutter/material.dart';
-import 'package:enjoy_diving/incubator6/ApplicationModel.dart';
+import 'package:enjoy_diving/model/ApplicationModel.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
 

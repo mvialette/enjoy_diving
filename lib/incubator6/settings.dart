@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:enjoy_diving/incubator6/ApplicationModel.dart';
+import 'package:enjoy_diving/model/ApplicationModel.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:enjoy_diving/service/LocationController.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
@@ -8,7 +8,6 @@ import 'package:enjoy_diving/view/component/SliverGroupHeader.dart';
 import 'package:package_info/package_info.dart';
 
 class SettingsPage extends StatefulWidget {
-
   SpotService spotService = new SpotService();
 
   SettingsPage({
@@ -20,13 +19,10 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
-
   final _formKey = GlobalKey<SettingsState>();
 
   // of the TextField.
   final myController = TextEditingController();
-
-  bool deviceLocationEnable = false;
 
   PackageInfo _packageInfo = PackageInfo(
     appName: 'Unknown',
@@ -57,12 +53,12 @@ class SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     myController.text = ApplicationModel.of(context).boatSpeed.toString();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        backgroundColor: Colors.indigo,
       ),
       body: new FutureBuilder<List<Spot>>(
         future: widget.spotService.getAllStartSpotsFromJson(),
@@ -91,10 +87,11 @@ class SettingsState extends State<SettingsPage> {
               }).toList(),
               onChanged: (Spot selectedSpot) {
                 setState(() {
-                  this.deviceLocationEnable = false;
                   ApplicationModel.of(context).fromSpot = selectedSpot;
-                  ApplicationModel.of(context).fromLocation['latitude'] = selectedSpot.latitude;
-                  ApplicationModel.of(context).fromLocation['longitude'] = selectedSpot.longitude;
+                  ApplicationModel.of(context).fromLocation['latitude'] =
+                      selectedSpot.latitude;
+                  ApplicationModel.of(context).fromLocation['longitude'] =
+                      selectedSpot.longitude;
                   //Navigator.pop(context, selectedSpot);
                 });
               },
@@ -105,145 +102,215 @@ class SettingsState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: widgets.toList(),
-                )
-            );
+                ));
 
-            CustomScrollView listView = CustomScrollView(
-                slivers: <Widget>[
-                  SliverGroupHeader(header: 'Géolocalisation'),
-                  SliverBoxContent(
-                    child:Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        /*
-                        new ActionChip(
-                            avatar: CircleAvatar(
-                              backgroundColor: Colors.grey.shade800,
-                              child: Icon(ApplicationModel.of(context).fromSpot == null ? Icons.check : Icons.close),
-                            ),
-                            label: Text('Géolocalisation'),
-                            backgroundColor: ApplicationModel.of(context).fromSpot == null ? Colors.green : Colors.orange,
-                            onPressed: () {
-                              //setState(() {
-                              setState(() {
-                                //ApplicationModel.of(context).fromSpot = null;
-                                LocationController locationController = new LocationController();
-
-                                //Map<String, double> fromLocationOfTheDevice = locationController.getFromLocation();
-                                locationController.getCurrentLocationOfDevice().then((fromLocationOfTheDevice) {
-                                  ApplicationModel.of(context).fromSpot = null;
-                                  ApplicationModel.of(context).fromLocation['latitude'] = fromLocationOfTheDevice['latitude'];
-                                  ApplicationModel.of(context).fromLocation['longitude'] = fromLocationOfTheDevice['longitude'];
-                                });
-                                //Map<String, double> fromLocationOfTheDevice = locationController.getCurrentLocation();
-                                //Map<String, double> fromLocationOfTheDevice = await locationController.getFromLocation();
-
-                              });
-
-                            }
-                        ),*/
-                        new SwitchListTile(
-                          title: new Text('Activer la géolocalisation du périphérique : '),
-                          value: this.deviceLocationEnable,
-                          onChanged: (bool toggle) {
-                            setState(() {
-                              this.deviceLocationEnable = toggle;
-                              if(this.deviceLocationEnable == true){
-                                 LocationController locationController = new LocationController();
-                                 ApplicationModel.of(context).fromSpot = null;
-                                 locationController.getCurrentLocationOfDevice().then((fromLocationOfTheDevice) {
-
-                                  ApplicationModel.of(context).fromLocation['latitude'] = fromLocationOfTheDevice['latitude'];
-                                  ApplicationModel.of(context).fromLocation['longitude'] = fromLocationOfTheDevice['longitude'];
-                                });
-                              }else {
-                                ApplicationModel.of(context).fromSpot = null;
-                                ApplicationModel.of(context).fromLocation.clear();
-                              }
+            CustomScrollView listView = CustomScrollView(slivers: <Widget>[
+              SliverGroupHeader(header: 'Géolocalisation'),
+              SliverBoxContent(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new SwitchListTile(
+                      title: new Text(
+                          'Activer la géolocalisation du périphérique : '),
+                      value: isDeviceLocationEnable(context),
+                      onChanged: (bool toggle) {
+                        setState(() {
+                          if (toggle == true) {
+                            LocationController locationController =
+                                new LocationController();
+                            ApplicationModel.of(context).fromSpot = null;
+                            locationController
+                                .getCurrentLocationOfDevice()
+                                .then((fromLocationOfTheDevice) {
+                              ApplicationModel.of(context)
+                                      .fromLocation['latitude'] =
+                                  fromLocationOfTheDevice['latitude'];
+                              ApplicationModel.of(context)
+                                      .fromLocation['longitude'] =
+                                  fromLocationOfTheDevice['longitude'];
                             });
-                          },
-                        ),
-                        Text(
-                          "où alors, sélectionner un port ou un lieu de mise à l'eau parmis la liste accessible (pas besoin alors de géolocalisation) active :",
-                        ),
-                        oneForm,
-                      ],
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context){
+                                  return AlertDialog(
+                                    title: new Text('No spots in this area found'),
+                                    content: new Text('Selectionner un autre point de départ ou modifiez vos critères de recheche.'),
+                                    actions: <Widget>[
+                                      new FlatButton(
+                                          onPressed: (){
+                                            Navigator.pop(context);
+                                          },
+                                          child: new Text('Close')),
+                                    ],
+                                  );
+                                }
+                            );
+                          } else {
+                            ApplicationModel.of(context).fromSpot = null;
+                            ApplicationModel.of(context).fromLocation.clear();
+                          }
+                        });
+                      },
                     ),
-                  ),
-                  SliverGroupHeader(header: 'Position'),
-                  SliverBoxContent(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'From location (used to calculate distance & time from this spot, to the diving available spots) : ',
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'From latitude (decimal) : ${isLocationDefined(context) ? 'N/A' : ApplicationModel.of(context).fromLocation['latitude']}',
-                        ),
-                        Text(
-                          'From longitude (decimal) : ${isLocationDefined(context) ? 'N/A' : ApplicationModel.of(context).fromLocation['longitude']}',
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'From (WGS 84) : ${isLocationDefined(context) ? 'N/A' : widget.spotService.getLocationsInWSG84(ApplicationModel.of(context).fromLocation['latitude'], ApplicationModel.of(context).fromLocation['longitude'])}',
-                        ),
-                      ],
+                    Text(
+                      "où alors, sélectionner un port ou un lieu de mise à l'eau parmis la liste accessible (pas besoin alors de géolocalisation) active :",
                     ),
-                  ),
-                  SliverGroupHeader(header: 'Navigation'),
-                  SliverBoxContent(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        new Text(
-                          "Quelle est la vitesse de votre navire ? (default 14 km/h)",
-                        ),
-                        TextField(
-                          controller: myController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Vitesse ( km/h )',
-                            prefixIcon: Icon(Icons.timer),
-                          ),
-                          keyboardType: TextInputType.number,
-                          onSubmitted: (text) {
-                            ApplicationModel.of(context).boatSpeed = double.parse(text);
-                          },
-                        )
-                      ],
+                    oneForm,
+                  ],
+                ),
+              ),
+              SliverGroupHeader(header: 'Position'),
+              SliverBoxContent(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'From location (used to calculate distance & time from this spot, to the diving available spots) : ',
                     ),
-                  ),
-                  SliverGroupHeader(header: 'A propos'),
-
-                  SliverBoxContent(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'From latitude (decimal) : ${isLocationUndefined(context) ? 'N/A' : ApplicationModel.of(context).fromLocation['latitude']}',
+                    ),
+                    Text(
+                      'From longitude (decimal) : ${isLocationUndefined(context) ? 'N/A' : ApplicationModel.of(context).fromLocation['longitude']}',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'From (WGS 84) : ${isLocationUndefined(context) ? 'N/A' : widget.spotService.getLocationsInWSG84(ApplicationModel.of(context).fromLocation['latitude'], ApplicationModel.of(context).fromLocation['longitude'])}',
+                    ),
+                  ],
+                ),
+              ),
+              SliverGroupHeader(header: 'Navigation'),
+              SliverBoxContent(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Text(
+                      "Quelle est la vitesse de votre navire ? (default 14 km/h)",
+                    ),
+                    TextField(
+                      controller: myController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Vitesse ( km/h )',
+                        prefixIcon: Icon(Icons.timer),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onSubmitted: (text) {
+                        ApplicationModel.of(context).boatSpeed =
+                            double.parse(text);
+                      },
+                    )
+                  ],
+                ),
+              ),
+              SliverGroupHeader(header: 'A propos'),
+              SliverBoxContent(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Row(
                       children: <Widget>[
                         Text(
                           "Cette application est développée par Maxime VIALETTE.",
-                        ),
-                        Text(
-                          "App name : ${_packageInfo.appName}",
-                        ),
-                        Text(
-                          "Package name : ${_packageInfo.packageName}",
-                        ),
-                        Text(
-                          "App version : ${_packageInfo.version}",
-                        ),
-                        Text(
-                          "Build number : ${_packageInfo.buildNumber}",
-                        ),
+                        )
                       ],
                     ),
-                  ),
-                ]);
+                    new Row(
+                      children: <Widget>[
+                        Text(
+                          "App name : ",
+                        ),
+                        new Container(
+                          height: 20.0,
+                          width: 200.0,
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade400
+                          ),
+                          child: Text(
+                            _packageInfo.appName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                        )
+                      ],
+                    ),
+                    new Row(
+                      children: <Widget>[
+                        Text(
+                          "Package name : ",
+                        ),
+                        new Container(
+                          height: 20.0,
+                          width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Colors.indigo.shade400
+                          ),
+                          child: Text(
+                            _packageInfo.packageName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
+                        )
+                      ],
+                    ),
+                    new Row(
+                      children: <Widget>[
+                        Text(
+                          "App version : ",
+                        ),
+                        new Container(
+                          height: 20.0,
+                          width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Colors.indigo.shade400
+                          ),
+                          child: Text(
+                            _packageInfo.version,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
+                        )
+                      ],
+                    ),
+                    new Row(
+                      children: <Widget>[
+                        Text(
+                          "Build number : ",
+                        ),
+                        new Container(
+                          height: 20.0,
+                          width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Colors.indigo.shade400
+                          ),
+                          child: Text(
+                            _packageInfo.buildNumber,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ]);
             return listView;
           }
         },
@@ -251,9 +318,11 @@ class SettingsState extends State<SettingsPage> {
     );
   }
 
-  bool isLocationDefined(BuildContext context) => ApplicationModel.of(context).fromLocation == null || ApplicationModel.of(context).fromLocation.length == 0;
+  bool isDeviceLocationEnable(BuildContext context) {
+    return ApplicationModel.of(context).fromSpot == null && !isLocationUndefined(context);
+  }
+
+  bool isLocationUndefined(BuildContext context) =>
+      ApplicationModel.of(context).fromLocation == null ||
+      ApplicationModel.of(context).fromLocation.length == 0;
 }
-
-
-
-

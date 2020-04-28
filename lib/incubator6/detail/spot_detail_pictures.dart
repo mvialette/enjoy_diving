@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
 import 'package:flutter/material.dart';
-import '../ApplicationModel.dart';
+import '../../model/ApplicationModel.dart';
 
 class SpotDetailPicitures  extends StatelessWidget {
 

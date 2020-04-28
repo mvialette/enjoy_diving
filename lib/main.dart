@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'incubator6/ApplicationModel.dart';
+import 'model/ApplicationModel.dart';
 import 'incubator6/settings.dart';
 import 'incubator6/spot_list.dart';
 import 'incubator6/spot_detail.dart';

@@ -3,7 +3,7 @@ import 'package:enjoy_diving/service/SpotService.dart';
 import 'package:enjoy_diving/view/component/CustomSpotCard.dart';
 import 'package:flutter/material.dart';
 
-import '../ApplicationModel.dart';
+import '../../model/ApplicationModel.dart';
 
 class SpotDetailDebug extends StatelessWidget {
 

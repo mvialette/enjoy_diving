@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:enjoy_diving/incubator6/ApplicationModel.dart';
+import 'package:enjoy_diving/model/ApplicationModel.dart';
 import 'package:enjoy_diving/model/RechercheBean.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:queries/collections.dart';
