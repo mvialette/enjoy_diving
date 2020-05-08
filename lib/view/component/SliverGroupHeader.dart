@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class SliverGroupHeader extends StatelessWidget {
-
   final String header;
 
   SliverGroupHeader({
@@ -11,7 +10,6 @@ class SliverGroupHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final theme = Theme.of(context);
 
     return SliverToBoxAdapter(
@@ -23,17 +21,14 @@ class SliverGroupHeader extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            new Divider(
+              color: theme.dividerColor,
+              thickness: 1,
+            ),
             Text(
               header,
-              style: theme.textTheme.headline,
+              style: theme.textTheme.headline5,
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 64),
-              child: Container(
-                height: 2,
-                color: theme.accentColor,
-              ),
-            )
           ],
         ),
       ),

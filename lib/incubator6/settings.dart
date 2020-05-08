@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:enjoy_diving/incubator6/edit_speed_boat.dart';
 import 'package:enjoy_diving/model/ApplicationModel.dart';
 import 'package:enjoy_diving/model/Spot.dart';
 import 'package:enjoy_diving/service/LocationController.dart';
 import 'package:enjoy_diving/service/SpotService.dart';
 import 'package:enjoy_diving/view/component/SliverBoxContent.dart';
 import 'package:enjoy_diving/view/component/SliverGroupHeader.dart';
+import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -20,6 +21,8 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsState extends State<SettingsPage> {
   final _formKey = GlobalKey<SettingsState>();
+
+  double _currentBoatSpeed;
 
   // of the TextField.
   final myController = TextEditingController();
@@ -37,13 +40,6 @@ class SettingsState extends State<SettingsPage> {
     _initPackageInfo();
   }
 
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    myController.dispose();
-    super.dispose();
-  }
-
   Future<void> _initPackageInfo() async {
     final PackageInfo info = await PackageInfo.fromPlatform();
     setState(() {
@@ -53,12 +49,16 @@ class SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    myController.text = ApplicationModel.of(context).boatSpeed.toString();
+    _currentBoatSpeed = ApplicationModel.of(context).boatSpeed;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
-        backgroundColor: Colors.indigo,
+        title: Text(
+          'Settings',
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        iconTheme: Theme.of(context).iconTheme,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: new FutureBuilder<List<Spot>>(
         future: widget.spotService.getAllStartSpotsFromJson(),
@@ -82,7 +82,7 @@ class SettingsState extends State<SettingsPage> {
               items: someSpots.map((Spot spot) {
                 return DropdownMenuItem<Spot>(
                   value: spot,
-                  child: Text(spot.title),
+                  child: Text(spot.place + ' : ' + spot.title),
                 );
               }).toList(),
               onChanged: (Spot selectedSpot) {
@@ -132,20 +132,21 @@ class SettingsState extends State<SettingsPage> {
                             });
                             showDialog(
                                 context: context,
-                                builder: (BuildContext context){
+                                builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: new Text('No spots in this area found'),
-                                    content: new Text('Selectionner un autre point de départ ou modifiez vos critères de recheche.'),
+                                    title:
+                                        new Text('No spots in this area found'),
+                                    content: new Text(
+                                        'Selectionner un autre point de départ ou modifiez vos critères de recheche.'),
                                     actions: <Widget>[
                                       new FlatButton(
-                                          onPressed: (){
+                                          onPressed: () {
                                             Navigator.pop(context);
                                           },
                                           child: new Text('Close')),
                                     ],
                                   );
-                                }
-                            );
+                                });
                           } else {
                             ApplicationModel.of(context).fromSpot = null;
                             ApplicationModel.of(context).fromLocation.clear();
@@ -191,22 +192,36 @@ class SettingsState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    new Text(
-                      "Quelle est la vitesse de votre navire ? (default 14 km/h)",
+                    Text(
+                      'Quelle est la vitesse de votre navire ? (km/h)',
                     ),
-                    TextField(
-                      controller: myController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Vitesse ( km/h )',
-                        prefixIcon: Icon(Icons.timer),
-                      ),
-                      keyboardType: TextInputType.number,
-                      onSubmitted: (text) {
-                        ApplicationModel.of(context).boatSpeed =
-                            double.parse(text);
-                      },
-                    )
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Icon(
+                            Icons.timer,
+                            color: Theme.of(context).primaryIconTheme.color,
+                          ),
+                          flex: 1,
+                        ),
+                        Expanded(
+                          child: Text('$_currentBoatSpeed'),
+                          flex: 5,
+                        ),
+                        Expanded(
+                          child: FlatButton(
+                            child: Icon(
+                              Icons.chevron_right,
+                              color: Theme.of(context).primaryIconTheme.color,
+                            ),
+                            onPressed: () {
+                              _navigateSpeedBoatPage(context);
+                            },
+                          ),
+                          flex: 1,
+                        )
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -230,9 +245,8 @@ class SettingsState extends State<SettingsPage> {
                         new Container(
                           height: 20.0,
                           width: 200.0,
-                          decoration: BoxDecoration(
-                            color: Colors.indigo.shade400
-                          ),
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade600),
                           child: Text(
                             _packageInfo.appName,
                             textAlign: TextAlign.center,
@@ -252,15 +266,12 @@ class SettingsState extends State<SettingsPage> {
                         new Container(
                           height: 20.0,
                           width: 200.0,
-                          decoration: BoxDecoration(
-                              color: Colors.indigo.shade400
-                          ),
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade600),
                           child: Text(
                             _packageInfo.packageName,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         )
                       ],
@@ -273,15 +284,12 @@ class SettingsState extends State<SettingsPage> {
                         new Container(
                           height: 20.0,
                           width: 200.0,
-                          decoration: BoxDecoration(
-                              color: Colors.indigo.shade400
-                          ),
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade600),
                           child: Text(
                             _packageInfo.version,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         )
                       ],
@@ -294,15 +302,12 @@ class SettingsState extends State<SettingsPage> {
                         new Container(
                           height: 20.0,
                           width: 200.0,
-                          decoration: BoxDecoration(
-                              color: Colors.indigo.shade400
-                          ),
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade600),
                           child: Text(
                             _packageInfo.buildNumber,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         )
                       ],
@@ -318,8 +323,21 @@ class SettingsState extends State<SettingsPage> {
     );
   }
 
+  _navigateSpeedBoatPage(BuildContext context) async {
+    Map results = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditSpeedBoatPage()),
+    );
+    if (results.containsKey('boatSpeedChanged')) {
+      setState(() {
+        _currentBoatSpeed = results['boatSpeedChanged'];
+      });
+    }
+  }
+
   bool isDeviceLocationEnable(BuildContext context) {
-    return ApplicationModel.of(context).fromSpot == null && !isLocationUndefined(context);
+    return ApplicationModel.of(context).fromSpot == null &&
+        !isLocationUndefined(context);
   }
 
   bool isLocationUndefined(BuildContext context) =>

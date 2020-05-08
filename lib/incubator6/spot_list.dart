@@ -61,13 +61,11 @@ class SpotListState extends State<SpotListPage> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue.shade700,
+        iconTheme: Theme.of(context).iconTheme,
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
           'Enjoy Diving',
-          style: TextStyle(
-              fontFamily: 'KaushanScript',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0),
+          style: Theme.of(context).textTheme.headline6,
         ),
         actions: <Widget>[
           IconButton(
@@ -81,7 +79,9 @@ class SpotListState extends State<SpotListPage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(
+              Icons.settings,
+            ),
             onPressed: () {
               _navigateAndDisplaySelection(context);
             },
@@ -120,8 +120,9 @@ class SpotListState extends State<SpotListPage> {
           }
         },
       ),
-      /*floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.brown,
+      /*
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).accentColor,
         child: Icon(
           Icons.add,
           color: Colors.white,
@@ -132,7 +133,8 @@ class SpotListState extends State<SpotListPage> {
                 !ApplicationModel.of(context).rechercheBean.deep0to20;
           });
         },
-      ),*/
+      ),
+      */
     );
   }
 
@@ -150,14 +152,16 @@ class SpotListState extends State<SpotListPage> {
       List<String> placeName, List<String> kinds) {
     List<Widget> resultSearchWidgets = new List();
     resultSearchWidgets.add(DrawerHeader(
-      /*
       decoration: BoxDecoration(
-        color: Colors.indigo,
+        color: Theme.of(context).primaryColorLight,
       ),
+      /*
+
       */
       child: Image.asset(
         'assets/tampon_48x18.png',
         fit: BoxFit.cover,
+        //color: Colors.red,
       ),
     ));
     // profondeur : 0-20, 20-40, 40-60
