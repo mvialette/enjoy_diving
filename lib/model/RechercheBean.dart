@@ -1,5 +1,4 @@
 class RechercheBean {
-
   String texte = null;
 
   bool deep0to20 = false;
@@ -11,31 +10,31 @@ class RechercheBean {
   Set<String> places = new Set();
   Set<String> kinds = new Set();
 
-  double distanceValue = 3000.0;
-  double maximumDistanceValue = 3000.0;
-  String distanceType = 'Kilometers';
+  double distanceValue = 100.0;
+  double maximumDistanceValue = 100.0;
+  String distanceType = 'Kilomètre';
 
-  RechercheBean(){
+  RechercheBean() {
     deep0to20 = true;
     deep20to40 = true;
     deep40to60 = true;
   }
 
   //place
-  void addPlace(String place){
+  void addPlace(String place) {
     places.add(place);
   }
 
-  void removePlace(String place){
+  void removePlace(String place) {
     places.remove(place);
   }
 
   //place
-  void addKind(String kind){
+  void addKind(String kind) {
     kinds.add(kind);
   }
 
-  void removeKind(String kind){
+  void removeKind(String kind) {
     kinds.remove(kind);
   }
 

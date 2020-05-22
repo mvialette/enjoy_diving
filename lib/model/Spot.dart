@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart' as material;
 import 'package:vector_math/vector_math.dart';
-import 'dart:math';
 
 List<Spot> spotsFromJson(String str) {
   final jsonData = json.decode(str);
 
-  return List<Spot>.from(
-      jsonData['d']['spots'].map((x) => Spot.fromJson(x)));
+  return List<Spot>.from(jsonData['d']['spots'].map((x) => Spot.fromJson(x)));
 }
 
 List<String> placeSpotsFromJson(String str) {
@@ -74,32 +74,40 @@ class Spot {
   });
 
   factory Spot.fromJson(Map<String, dynamic> json) => Spot(
-    numid: json["id"] == null ? null : json["id"],
-    title: json["name"] == null ? '' : json["name"],
-    pictures: json["photos"] == null ? null : json["photos"].split(' | '),
-    description: json["description"] == null ? '' : json["description"],
-    summary: json["resume"] == null ? '' : json["resume"],
-    deathLimit: json["profondeurMax"] == null ? 60 : int.parse(json["profondeurMax"]),
-    deathInterest: json["zoneInteret"] == null ? '' : json["zoneInteret"] + " m",
-    amer: json["amer"] == null ? '' : json["amer"],
-    historic: json["historique"] == null ? '' : json["historique"],
-    illustration: json["illustration"] == null ? '' : json["illustration"],
-    rescuePoint: json["lieuEvacuation"] == null ? '' : json["lieuEvacuation"],
-    windDirectionNotAllowed: json["directionVentAEviter"] == null ? '' : json["directionVentAEviter"],
-    place: json["zoneGeographique"] == null ? '' : json["zoneGeographique"],
-    longitude: json["longitude"] == null ? 0.0 : double.parse(json["longitude"]),
-    latitude: json["latitude"] == null ? 0.0 : double.parse(json["latitude"]),
-    positionVerified: json["gpsValide"] == null ? false : json["gpsValide"] == 'true',
-    kind: json["type"] == null ? '' : json["type"],
-  );
+        numid: json["id"] == null ? null : json["id"],
+        title: json["name"] == null ? '' : json["name"],
+        pictures: json["photos"] == null ? null : json["photos"].split(' | '),
+        description: json["description"] == null ? '' : json["description"],
+        summary: json["resume"] == null ? '' : json["resume"],
+        deathLimit: json["profondeurMax"] == null
+            ? 60
+            : int.parse(json["profondeurMax"]),
+        deathInterest:
+            json["zoneInteret"] == null ? '' : json["zoneInteret"] + " m",
+        amer: json["amer"] == null ? '' : json["amer"],
+        historic: json["historique"] == null ? '' : json["historique"],
+        illustration: json["illustration"] == null ? '' : json["illustration"],
+        rescuePoint:
+            json["lieuEvacuation"] == null ? '' : json["lieuEvacuation"],
+        windDirectionNotAllowed: json["directionVentAEviter"] == null
+            ? ''
+            : json["directionVentAEviter"],
+        place: json["zoneGeographique"] == null ? '' : json["zoneGeographique"],
+        longitude:
+            json["longitude"] == null ? 0.0 : double.parse(json["longitude"]),
+        latitude:
+            json["latitude"] == null ? 0.0 : double.parse(json["latitude"]),
+        positionVerified:
+            json["gpsValide"] == null ? false : json["gpsValide"] == 'true',
+        kind: json["type"] == null ? '' : json["type"],
+      );
 
   //boolean is
-  bool get isHarbor{
+  bool get isHarbor {
     return kind == 'port';
   }
 
   double getDistanceFromHereInKm(Map<String, double> fromLocation) {
-
     //print(fromLocation);
 
     double fromLatitude = null;
@@ -112,14 +120,17 @@ class Spot {
     double latitudeSCAAnnecyPlongee = 45.89792728258401;
     double longitudeSCAAnnecyPlongee = 6.1317678960456306;
 
-    if(fromLocation != null){
+    double latitudePortLeBrusc = 43.0754;
+    double longitudePortLeBrusc = 5.79743333333333;
+
+    if (fromLocation != null && fromLocation.length == 2) {
       // location of the device
       fromLongitude = fromLocation['longitude'];
       fromLatitude = fromLocation['latitude'];
-    }else {
+    } else {
       // sinon disont qu'on part d'ailleurs
-      fromLatitude = latitudeSCAAnnecyPlongee;
-      fromLongitude = longitudeSCAAnnecyPlongee;
+      fromLatitude = latitudePortLeBrusc;
+      fromLongitude = longitudePortLeBrusc;
     }
     //fromLatitude = latitudePortSaintMandrier;
     //fromLongitude = longitudePortSaintMandrier;
@@ -138,7 +149,7 @@ class Spot {
 
     // apply haversine formulae
     var a = pow(sin(dLat / 2), 2) +
-           (pow(sin(dLon / 2), 2) * cos(fromLatitude) * cos(toLatitude));
+        (pow(sin(dLon / 2), 2) * cos(fromLatitude) * cos(toLatitude));
 
     var c = 2 * atan2(sqrt(a), sqrt(1 - a));
     var radius = 6371;
@@ -150,14 +161,15 @@ class Spot {
   }
 
   String getTimeToGo(Map<String, double> currentLocation, double boatSpeed) {
-    double timeToGoInMinute = getDistanceFromHereInKm(currentLocation) / boatSpeed * 60;
+    double timeToGoInMinute =
+        getDistanceFromHereInKm(currentLocation) / boatSpeed * 60;
     int numberOfHour = 0;
     while (timeToGoInMinute > 60) {
       numberOfHour++;
       timeToGoInMinute = timeToGoInMinute - 60;
     }
     String hourPrefix = '';
-    if(numberOfHour > 0) {
+    if (numberOfHour > 0) {
       hourPrefix = '${numberOfHour}h';
     }
     return '${hourPrefix}${timeToGoInMinute.toStringAsFixed(0)} min';
@@ -167,50 +179,66 @@ class Spot {
 
   int get hashCode => numid.hashCode;
 
-  bool startPoint(double lat, double long) => latitude == lat && longitude == long;
+  bool startPoint(double lat, double long) =>
+      latitude == lat && longitude == long;
 
-  material.Color getIconColor(){
-    if(isHarbor){
+  material.Color getIconColor() {
+    if (isHarbor) {
       return material.Colors.black;
-    }else{
-      if(deathLimit > 60){
-       return material.Colors.black;
-      }else if( deathLimit > 40) {
+    } else {
+      if (deathLimit > 60) {
+        return material.Colors.black;
+      } else if (deathLimit > 40) {
         return material.Colors.red;
-      }else if( deathLimit > 20) {
+      } else if (deathLimit > 20) {
         return material.Colors.orange;
-      }else{
+      } else {
         return material.Colors.green.shade900;
       }
     }
   }
 
   material.Icon getIcon(double fromLat, double fromLong) {
-    if(latitude == fromLat && longitude == fromLong){
+    if (latitude == fromLat && longitude == fromLong) {
       return material.Icon(material.Icons.flag);
-    }else if(isHarbor){
+    } else if (isHarbor) {
       return material.Icon(material.Icons.directions_boat);
-    }else{
+    } else {
       return material.Icon(material.Icons.location_on);
     }
   }
 
   material.Icon getIconKind() {
-    switch(kind) {
-      case "port": { return material.Icon(material.Icons.directions_boat); }
-      break;
+    switch (kind) {
+      case "port":
+        {
+          return material.Icon(material.Icons.directions_boat);
+        }
+        break;
 
-      case "tombant": { return material.Icon(material.Icons.filter_hdr); }
-      break;
+      case "tombant":
+        {
+          return material.Icon(material.Icons.filter_hdr);
+        }
+        break;
 
-      case "épave": { return material.Icon(material.Icons.airplanemode_active); }
-      break;
+      case "épave":
+        {
+          return material.Icon(material.Icons.airplanemode_active);
+        }
+        break;
 
-      case "epave": { return material.Icon(material.Icons.airplanemode_active); }
-      break;
+      case "epave":
+        {
+          return material.Icon(material.Icons.airplanemode_active);
+        }
+        break;
 
-      default: { return material.Icon(material.Icons.location_on); }
-      break;
+      default:
+        {
+          return material.Icon(material.Icons.location_on);
+        }
+        break;
     }
   }
 }

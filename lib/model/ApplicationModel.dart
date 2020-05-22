@@ -3,8 +3,8 @@ import 'package:enjoy_diving/model/Spot.dart';
 import 'package:flutter/material.dart';
 
 class ApplicationModel extends InheritedModel<Map<String, double>> {
-
   final Map<String, double> fromLocation = new Map();
+  bool mapCenterLocationByFromLocation = false;
 
   double boatSpeed = 14;
 
@@ -28,7 +28,9 @@ class ApplicationModel extends InheritedModel<Map<String, double>> {
   }
 
   @override
-  bool updateShouldNotifyDependent(InheritedModel<Map<String, double>> oldWidget, Set<Map<String, double>> dependencies) {
+  bool updateShouldNotifyDependent(
+      InheritedModel<Map<String, double>> oldWidget,
+      Set<Map<String, double>> dependencies) {
     return true;
   }
 }
