@@ -54,10 +54,9 @@ class SettingsState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Settings',
-          style: Theme.of(context).textTheme.headline6,
+          'Paramètres',
         ),
-        iconTheme: Theme.of(context).iconTheme,
+        iconTheme: Theme.of(context).primaryIconTheme,
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: new FutureBuilder<List<Spot>>(
@@ -200,7 +199,7 @@ class SettingsState extends State<SettingsPage> {
                         Expanded(
                           child: Icon(
                             Icons.timer,
-                            color: Theme.of(context).primaryIconTheme.color,
+                            color: Theme.of(context).iconTheme.color,
                           ),
                           flex: 1,
                         ),
@@ -212,7 +211,7 @@ class SettingsState extends State<SettingsPage> {
                           child: FlatButton(
                             child: Icon(
                               Icons.chevron_right,
-                              color: Theme.of(context).primaryIconTheme.color,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                             onPressed: () {
                               _navigateSpeedBoatPage(context);
