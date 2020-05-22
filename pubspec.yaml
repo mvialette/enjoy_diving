@@ -1,6 +1,6 @@
 name: enjoy_diving
 description: A flutter application about diving spots.
-version: 0.0.3+05082214
+version: 0.0.4+05151753
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -43,7 +43,7 @@ flutter:
   assets:
     - assets/spots.json
     - assets/launcher/ic_launcher.png
-    - assets/tampon_48x18.png
+    - assets/tampon_marker_map.png
 
   fonts:
     - family: KaushanScript
