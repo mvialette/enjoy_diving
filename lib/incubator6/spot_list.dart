@@ -61,11 +61,8 @@ class SpotListState extends State<SpotListPage> {
         ),
       ),
       appBar: AppBar(
-        iconTheme: Theme.of(context).iconTheme,
-        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
           'Enjoy Diving',
-          style: Theme.of(context).textTheme.headline6,
         ),
         actions: <Widget>[
           IconButton(
@@ -86,6 +83,16 @@ class SpotListState extends State<SpotListPage> {
               _navigateAndDisplaySelection(context);
             },
           ),
+          /*
+          IconButton(
+
+            icon: Icon(
+              Icons.info_outline,
+            ),
+            onPressed: () {
+              _navigateAndDisplaySelection(context);
+            },
+          ),*/
         ],
       ),
       body: new FutureBuilder<List<Spot>>(
@@ -96,13 +103,8 @@ class SpotListState extends State<SpotListPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomSpotCard(
-                    'Bienvenue dans l\'application Enjoy Diving, pour découvrir les spots de plongées référencé, veuillez au-préalable vous rendre dans la page des paramètres de l\'application afin de la configurer. Bonne exploration.',
-                    Colors.lightBlue),
-                CustomSpotCard('Comment profiter au mieux de vos plongées ?',
-                    Colors.lightBlue),
-                CustomSpotCard(
-                    'Statistiques : Dans cette application, 108 spots sont référencés, dans 3 localités.',
-                    Colors.lightBlue),
+                    'Bienvenue dans l\'application Enjoy Diving, voici 5 spots aléatoirements sélectionnés :',
+                    null),
               ],
             );
           } else if (snapshot.hasError) {
@@ -152,22 +154,20 @@ class SpotListState extends State<SpotListPage> {
       List<String> placeName, List<String> kinds) {
     List<Widget> resultSearchWidgets = new List();
     resultSearchWidgets.add(DrawerHeader(
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColorLight,
-      ),
-      /*
-
-      */
-      child: Image.asset(
-        'assets/tampon_48x18.png',
-        fit: BoxFit.cover,
-        //color: Colors.red,
-      ),
-    ));
+        decoration: BoxDecoration(color: Colors.brown.shade700),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/tampon_marker_map.png',
+              fit: BoxFit.cover,
+              color: Theme.of(context).primaryIconTheme.color,
+            ),
+          ],
+        )));
     // profondeur : 0-20, 20-40, 40-60
     resultSearchWidgets.add(ExpansionTile(
-      title: Text('Profondeur',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      title: Text('Profondeur'),
       //changeOnRedraw: false,
       children: <Widget>[
         new SwitchListTile(
@@ -259,10 +259,8 @@ class SpotListState extends State<SpotListPage> {
         });
 
     // zone : All available areas
-    resultSearchWidgets.add(ExpansionTile(
-        title: Text('Type',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        children: resultKindWidgets));
+    resultSearchWidgets
+        .add(ExpansionTile(title: Text('Type'), children: resultKindWidgets));
 
     // the widgets for area selection
     List<Widget> resultSearchPlaceWidgets = new List();
@@ -307,18 +305,16 @@ class SpotListState extends State<SpotListPage> {
           ))
         });
 
-    var _listDistanceType = ['Kilometers', 'Miles', 'Minutes'];
+    var _listDistanceType = ['Kilomètre', 'Miles', 'Minutes'];
+    //var _listDistanceType = ['Kilometers', 'Miles', 'Minutes'];
 
     // zone : All available areas
-    resultSearchWidgets.add(ExpansionTile(
-        title: Text('Zone',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        children: resultSearchPlaceWidgets));
+    resultSearchWidgets.add(
+        ExpansionTile(title: Text('Zone'), children: resultSearchPlaceWidgets));
 
     // distance : km, miles marin, minutes + valeur (input type numerique)
     resultSearchWidgets.add(ExpansionTile(
-      title: Text('Distance',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      title: Text('Distance'),
       children: <Widget>[
         new DropdownButton<String>(
           value: ApplicationModel.of(context).rechercheBean.distanceType,
@@ -362,7 +358,12 @@ class SpotListState extends State<SpotListPage> {
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: Center(
           child: RaisedButton(
-            child: Text('Rechercher'),
+            // color: Theme.of(context).accentColor,
+            child: Text(
+              'Rechercher',
+              // style:
+              //    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
             onPressed: () {
               // Validate returns true if the form is valid, or false
               // otherwise.
@@ -401,7 +402,9 @@ class _SpotList extends StatelessWidget {
         // this is the list mode
         return ListView.separated(
           itemCount: spots.length,
-          separatorBuilder: (context, index) => Divider(),
+          separatorBuilder: (context, index) => Divider(
+            thickness: 1,
+          ),
           itemBuilder: (context, index) => _SpotTile(
             spot: spots[index],
             //fromLocation : ApplicationModel.of(context).fromLocation,
@@ -447,12 +450,35 @@ class _SpotList extends StatelessWidget {
             .toList();
 
         LatLngBounds mapBoundary = extractBounds(context);
+        // TODO : witch is the good center position of the map
+        double centerLat = null;
+        double centerLong = null;
+
+        // Is the user want to considering start point ?
+        if (!ApplicationModel.of(context).mapCenterLocationByFromLocation) {
+          // if from location is undifined, define center position in the middel of spots available bounds
+          if (ApplicationModel.of(context).fromLocation.length == 0) {
+            centerLat = (mapBoundary.north + mapBoundary.south) / 2;
+            centerLong = (mapBoundary.east + mapBoundary.west) / 2;
+          } else if (ApplicationModel.of(context).fromLocation.length == 2) {
+            centerLat = ApplicationModel.of(context).fromLocation['latitude'];
+            centerLong = ApplicationModel.of(context).fromLocation['longitude'];
+          }
+        } else {
+          if (ApplicationModel.of(context).fromLocation.length == 2) {
+            centerLat = ApplicationModel.of(context).fromLocation['latitude'];
+            centerLong = ApplicationModel.of(context).fromLocation['longitude'];
+          } else {
+            // TODO : display a user dialog to send them on settings page
+            print(
+                'User mapCenterLocationByFromLocation is true, but fromLocation hasn'
+                't been specified.');
+          }
+        }
 
         return new FlutterMap(
             options: new MapOptions(
-              center: new LatLng(
-                  ApplicationModel.of(context).fromLocation['latitude'],
-                  ApplicationModel.of(context).fromLocation['longitude']),
+              center: new LatLng(centerLat, centerLong),
               // define bound for South West
               swPanBoundary: mapBoundary.southWest,
               // define bound for North Eeast
@@ -463,6 +489,7 @@ class _SpotList extends StatelessWidget {
               maxZoom: 18.0,
             ),
             layers: [
+              // TODO : keep mapbox implementation ? reviens accessToken (externalize it into private file)
               new TileLayerOptions(
                 urlTemplate: "https://api.tiles.mapbox.com/v4/"
                     "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
@@ -548,21 +575,26 @@ class _SpotList extends StatelessWidget {
       }
     });
 
-    // Is the from location inside boundary ?
-    if (northMin < ApplicationModel.of(context).fromLocation['latitude']) {
-      northMin = ApplicationModel.of(context).fromLocation['latitude'];
-    }
+    if (ApplicationModel.of(context).fromLocation.length == 0) {
+      // this means no from location has been specified
+    } else if (ApplicationModel.of(context).fromLocation.length == 2) {
+      // Is the from location inside boundary ?
+      // TODO : Whitch strategy should by apply if from locattion is empty ?
+      if (northMin < ApplicationModel.of(context).fromLocation['latitude']) {
+        northMin = ApplicationModel.of(context).fromLocation['latitude'];
+      }
 
-    if (southMin > ApplicationModel.of(context).fromLocation['latitude']) {
-      southMin = ApplicationModel.of(context).fromLocation['latitude'];
-    }
+      if (southMin > ApplicationModel.of(context).fromLocation['latitude']) {
+        southMin = ApplicationModel.of(context).fromLocation['latitude'];
+      }
 
-    if (eastMin < ApplicationModel.of(context).fromLocation['longitude']) {
-      eastMin = ApplicationModel.of(context).fromLocation['longitude'];
-    }
+      if (eastMin < ApplicationModel.of(context).fromLocation['longitude']) {
+        eastMin = ApplicationModel.of(context).fromLocation['longitude'];
+      }
 
-    if (westMin > ApplicationModel.of(context).fromLocation['longitude']) {
-      westMin = ApplicationModel.of(context).fromLocation['longitude'];
+      if (westMin > ApplicationModel.of(context).fromLocation['longitude']) {
+        westMin = ApplicationModel.of(context).fromLocation['longitude'];
+      }
     }
 
     print(
@@ -596,15 +628,25 @@ class _SpotTile extends StatefulWidget {
 
 class _SpotTileState extends State<_SpotTile> {
   Widget build(BuildContext context) {
+    IconData currentIconData = null;
+    if (widget.spot.kind == 'port') {
+      currentIconData = Icons.directions_boat;
+    } else if (widget.spot.kind == 'sec') {
+      currentIconData = Icons.assistant_photo;
+    } else if (widget.spot.kind == 'epave') {
+      currentIconData = Icons.airplanemode_active;
+    }
+
     return ListTile(
       leading: SizedBox(
         width: 100,
         height: 56,
         child: Hero(
           tag: 'image_${widget.spot.numid}',
-          child: widget.spot.kind == 'port'
-              ? Icon(Icons.directions_boat)
-              : Icon(Icons.airplanemode_active),
+          child: Icon(
+            currentIconData,
+            color: Theme.of(context).accentIconTheme.color,
+          ),
           /* CachedNetworkImage(
             placeholder: (context, url) => Container(
               color: Colors.black12,
@@ -619,7 +661,6 @@ class _SpotTileState extends State<_SpotTile> {
         tag: 'title_${widget.spot.numid}',
         child: Text(
           widget.spot.title,
-          style: Theme.of(context).textTheme.subhead,
         ),
       ),
       subtitle: Text(widget.spot.deathLimit.toString() + " m"),
