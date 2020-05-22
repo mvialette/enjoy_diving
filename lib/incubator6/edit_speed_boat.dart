@@ -40,9 +40,8 @@ class EditSpeedBoatState extends State<EditSpeedBoatPage> {
         appBar: AppBar(
           title: Text(
             'Speed Boat',
-            style: Theme.of(context).textTheme.headline6,
           ),
-          iconTheme: Theme.of(context).iconTheme,
+          iconTheme: Theme.of(context).primaryIconTheme,
           backgroundColor: Theme.of(context).primaryColor,
           actions: <Widget>[
             IconButton(
